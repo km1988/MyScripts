@@ -1,0 +1,16 @@
+async function main(workbook: ExcelScript.Workbook, rawUnicodeString: string): Promise<void> {
+  const sheet = workbook.getActiveWorksheet();
+  const decodedString = decodeUnicode(rawUnicodeString);
+
+  // Writing the decoded string to a specific cell (A1 in this example).
+  sheet.getRange("A1").setValues([[decodedString]]);
+}
+
+function decodeUnicode(str: string): string {
+  return str.replace(/\\u([\d\w]{4})/gi, (match, grp) => {
+    return String.fromCharCode(parseInt(grp, 16));
+  });
+}
+
+// Remove this test when using with Power Automate.
+main(Excel.run, "\\u0048\\u0065\\u006C\\u006C\\u006F").catch(console.error);
