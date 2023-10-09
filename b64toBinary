@@ -1,15 +1,28 @@
-function base64ToBinary(base64) {
-    let binary_string = window.atob(base64);
-    let len = binary_string.length;
-    let bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-        bytes[i] = binary_string.charCodeAt(i);
+async function main(context: Excel.RequestContext) {
+    // Get the first worksheet
+    let sheet = context.workbook.worksheets.getItemAt(0);
+    // Get cell A1 where the base64 string is stored
+    let base64Cell = sheet.getRange("A1");
+    // Load the value of cell A1
+    base64Cell.load("values");
+    
+    await context.sync();
+
+    // Get the base64 string from the cell
+    let base64String = base64Cell.values[0][0];
+    
+    // Decode the base64 string to binary-like string
+    let binaryString = atob(base64String);
+    
+    // If you need to convert the binary-like string to an array of bytes
+    let byteArray = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        byteArray[i] = binaryString.charCodeAt(i);
     }
-    return bytes;
+
+    // Writing binary-like string to cell B1
+    // If needed, convert the byteArray to a human-readable format before writing to the cell
+    sheet.getRange("B1").values = [[binaryString]];
+
+    await context.sync();
 }
-
-// You can call the function like this with your base64 string
-let base64String = "SGVsbG8gd29ybGQ="; // Example base64 string (decodes to "Hello world")
-let binaryData = base64ToBinary(base64String);
-
-console.log(binaryData);
