@@ -1,0 +1,8 @@
+function stringToBinary(str: string): string {
+  let binary = "";
+  for (let i = 0; i < str.length; i++) {
+    let binaryChar = str.charCodeAt(i).toString(2);
+    binary += binaryChar.padStart(8, '0') + " "; // Pads binaryChar with zeros to make it 8 bits long
+  }
+  return binary.trim();
+}
