@@ -1,4 +1,4 @@
-/ Define your own atob function
+// Define your own atob function
 function atob(input) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
     let str = '';
@@ -21,4 +21,14 @@ function atob(input) {
     }
 
     return str;
+}
+
+// Now you can use atob in your script
+async function main(context: Excel.RequestContext) {
+    // Your existing code...
+
+    // Example usage of atob
+    let binaryString = atob('SGVsbG8gV29ybGQ=');
+
+    // Your existing code...
 }
