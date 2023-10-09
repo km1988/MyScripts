@@ -1,0 +1,15 @@
+function base64ToBinary(base64) {
+    let binary_string = window.atob(base64);
+    let len = binary_string.length;
+    let bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes;
+}
+
+// You can call the function like this with your base64 string
+let base64String = "SGVsbG8gd29ybGQ="; // Example base64 string (decodes to "Hello world")
+let binaryData = base64ToBinary(base64String);
+
+console.log(binaryData);
