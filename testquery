@@ -1,5 +1,11 @@
+index=your_index your_search_criteria
 | rex field=url "https?://(?<full_domain>[^/]+)"
-| lookup allTLDs.csv TLD AS full_domain OUTPUT TLD AS matched_tld
-| eval domain=if(isnotnull(matched_tld), replace(full_domain, "." . matched_tld, ""), null())
-| eval TLD=if(isnotnull(matched_tld), "." . matched_tld, null())
+| append [ | inputlookup allTLDs.csv | rename TLD as matched_tld | eval id = 1 ]
+| eval id = 1
+| stats values(*) as * by id
+| mvexpand matched_tld
+| eval match = if(match(full_domain, matched_tld + "$"), matched_tld, null())
+| where isnotnull(match)
+| eval domain = replace(full_domain, "." . match, "")
+| eval TLD = match
 | table url, full_domain, domain, TLD
