@@ -1,0 +1,12 @@
+| inputlookup your_log_file.csv
+| rex field=url "https?://(?<hostname>[^/]+)"
+| eval split_host=split(hostname, ".")
+| mvexpand split_host
+| streamstats count as part_id by hostname
+| eval part_combo=mvappend(part_combo, split_host)
+| reverse part_combo
+| mvcombine delim="." part_combo
+| lookup TLD.csv TLD as part_combo OUTPUT TLD as matched_tld
+| stats max(matched_tld) as tld by hostname
+| eval domain=if(isnotnull(tld), replace(hostname, "^(.*)\." + tld + "$", "\1"), hostname)
+| table url, domain
