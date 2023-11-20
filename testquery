@@ -1,12 +1,5 @@
-| rex field=url "https?://(?<hostname>[^/]+)"
-| eval hostname_parts = split(hostname, ".")
-| reverse hostname_parts
-| eval potential_tld = hostname_parts
-| mvexpand potential_tld
-| streamstats current=f last(potential_tld) as prev by hostname
-| eval tld_candidate = if(isnull(prev), potential_tld, potential_tld . "." . prev)
-| reverse tld_candidate
-| lookup TLD.csv TLD as tld_candidate OUTPUT TLD as matched_tld
-| stats first(matched_tld) as tld by hostname
-| eval domain=if(isnotnull(tld), replace(hostname, "^(.*)\." + tld + "$", "\1"), hostname)
-| table url, domain
+| rex field=url "https?://(?<full_domain>[^/]+)"
+| lookup allTLDs.csv TLD AS full_domain OUTPUT TLD AS matched_tld
+| eval domain=if(isnotnull(matched_tld), replace(full_domain, "." . matched_tld, ""), null())
+| eval TLD=if(isnotnull(matched_tld), "." . matched_tld, null())
+| table url, full_domain, domain, TLD
